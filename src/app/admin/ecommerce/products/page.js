@@ -509,7 +509,7 @@ const handleSave = async (data) => {
         </Button>
       </div>
 
-      <div className="relative w-full sm:max-w-sm">
+      {/* <div className="relative w-full sm:max-w-sm">
         <Search
           size={16}
           className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
@@ -545,7 +545,7 @@ const handleSave = async (data) => {
             <X size={16} />
           </button>
         )}
-      </div>
+      </div> */}
 
       {products.length === 0 ? (
         <div className="w-full rounded-lg border bg-white p-10 text-center text-sm text-muted-foreground">
