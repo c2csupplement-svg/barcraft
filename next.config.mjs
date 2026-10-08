@@ -1,3 +1,6 @@
+
+
+
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -26,7 +29,7 @@ const nextConfig = {
     return [
       {
         source: "/backend/:path*",
-        destination: "http://66.116.242.51:3016/barcraft/:path*",
+        destination: "http://66.116.242.51:3017/barcraft/:path*",
       },
     ];
   },
