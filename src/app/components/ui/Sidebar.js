@@ -19,7 +19,8 @@ import {
   LayoutGrid,
   Target,
   SlidersHorizontal,
-  PhoneCall
+  PhoneCall,
+  CalendarCheck
 } from "lucide-react";
 
 const navGroups = [
@@ -66,7 +67,12 @@ const navGroups = [
         label: "Review",
         href: "/admin/ecommerce/review",
         icon: SlidersHorizontal,
-      }
+      },
+      {
+        label: "Booking",
+        href: "/admin/ecommerce/booking",
+        icon: CalendarCheck,
+      },
     ],
   },
 ];
