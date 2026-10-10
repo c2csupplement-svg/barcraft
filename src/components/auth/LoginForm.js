@@ -13,6 +13,7 @@ import {
   ShoppingBag,
   Users,
   ShieldCheck,
+  BookOpen,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,7 @@ import { Label } from "@/components/ui/label";
 const areas = [
   { icon: Package, title: "Products", text: "Add, edit and organise your catalogue." },
   { icon: ShoppingBag, title: "Booking", text: "Track and fulfil Booking as they come in." },
-  {icon: BookOpen, title: "Blogs",text: "Create and manage blog posts, publish content, and boost your website's SEO.",},
+  { icon: BookOpen, title: "Blogs", text: "Create and manage blog posts, publish content, and boost your website's SEO." },
 ];
 
 function Logo({ className = "" }) {
