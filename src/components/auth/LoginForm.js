@@ -22,8 +22,8 @@ import { Label } from "@/components/ui/label";
 
 const areas = [
   { icon: Package, title: "Products", text: "Add, edit and organise your catalogue." },
-  { icon: ShoppingBag, title: "Orders", text: "Track and fulfil orders as they come in." },
-  { icon: Users, title: "Customers", text: "See who's buying and what they need." },
+  { icon: ShoppingBag, title: "Booking", text: "Track and fulfil Booking as they come in." },
+  {icon: BookOpen, title: "Blogs",text: "Create and manage blog posts, publish content, and boost your website's SEO.",},
 ];
 
 function Logo({ className = "" }) {

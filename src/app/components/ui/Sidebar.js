@@ -20,7 +20,8 @@ import {
   Target,
   SlidersHorizontal,
   PhoneCall,
-  CalendarCheck
+  CalendarCheck,
+  Utensils
 } from "lucide-react";
 
 const navGroups = [
@@ -73,6 +74,16 @@ const navGroups = [
         href: "/admin/ecommerce/booking",
         icon: CalendarCheck,
       },
+     {
+  label: "Recipe Category",
+  href: "/admin/ecommerce/recipecategory",
+  icon: Tags,
+},
+{
+  label: "Recipe",
+  href: "/admin/ecommerce/recipe",
+  icon: Utensils,
+},
     ],
   },
 ];
