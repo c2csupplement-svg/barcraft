@@ -68,7 +68,7 @@ export const createProduct = async (formData) => {
       {
         headers: {
           ...getAuthHeaders(),
-          Accept: "application/json",
+          Accept: "multipart/form-data",
         },
       }
     );
@@ -121,6 +121,7 @@ export const updateProduct = async (id, formData) => {
 
 export const getProduct = async (page = 1, limit = 20) => {
   try {
+    console.log(API_URL)
     const response = await axios.get(
       `${API_URL}/api/product/dashboard?page=${page}&limit=${limit}`,
       {
@@ -174,10 +175,10 @@ export const deleteProduct = async (id) => {
   }
 };
 
-export const searchProduct = async (product) => {
+export const searchProduct = async (product, page=1, limit=20,) => {
   try {
     const response = await axios.get(
-      `${API_URL}/api/product/search?q=${encodeURIComponent(product)}&all=true`,
+      `${API_URL}/api/product/search?q=${encodeURIComponent(product)}&page=${page}&limit=${limit}`,
       {
         headers: {
           ...getAuthHeaders(),
@@ -198,6 +199,8 @@ export const searchProduct = async (product) => {
 };
 
 export const updateProductStatus = async (productId, status) => {
+
+  console.log(productId)
   try {
     const response = await axios.patch(
       `${API_URL}/api/product/status/${encodeURIComponent(productId)}`,

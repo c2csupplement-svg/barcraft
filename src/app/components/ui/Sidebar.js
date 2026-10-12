@@ -34,6 +34,11 @@ const navGroups = [
         icon: Package,
       },
       {
+        label: "Product Category",
+        href: "/admin/ecommerce/productcategory",
+        icon: Package,
+      },
+      {
         label: "Faq",
         href: "/admin/ecommerce/faq",
         icon: LayoutGrid,
@@ -74,16 +79,16 @@ const navGroups = [
         href: "/admin/ecommerce/booking",
         icon: CalendarCheck,
       },
-     {
-  label: "Recipe Category",
-  href: "/admin/ecommerce/recipecategory",
-  icon: Tags,
-},
-{
-  label: "Recipe",
-  href: "/admin/ecommerce/recipe",
-  icon: Utensils,
-},
+      {
+        label: "Recipe Category",
+        href: "/admin/ecommerce/recipecategory",
+        icon: Tags,
+      },
+      {
+        label: "Recipe",
+        href: "/admin/ecommerce/recipe",
+        icon: Utensils,
+      },
     ],
   },
 ];
