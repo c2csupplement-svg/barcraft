@@ -13,6 +13,7 @@ import {
   ShoppingBag,
   Users,
   ShieldCheck,
+  BookOpen
 } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { Button } from "@/components/ui/button";

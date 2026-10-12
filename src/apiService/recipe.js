@@ -116,9 +116,9 @@ export const deleteRecipeRecipe = async (id) => {
     }
 }
 
-export const getRecipe = async () => {
+export const getRecipe = async (page=1, limit=20,search="", status="") => {
     try{
-        const response = await axios.get(`${API_URL}/api/recipe/dashboard`,
+        const response = await axios.get(`${API_URL}/api/recipe/dashboard?page=${page}&limit=${limit}&search=${search}&status=${status}`,
             {
                 headers:"application/json"
             }

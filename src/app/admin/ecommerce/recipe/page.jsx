@@ -81,7 +81,7 @@ const getCategoryList = (response) => {
     return [];
 };
 
-const getRecipeId = (recipe) => recipe?._id || recipe?.id || "";
+const getRecipeId = (recipe) => recipe?._id || "";
 
 const getErrorMessage = (error, fallback) =>
     error?.response?.data?.message || error?.message || fallback;

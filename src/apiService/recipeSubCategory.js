@@ -116,9 +116,9 @@ export const deleteSubCategory = async (id) => {
     }
 }
 
-export const getCategory = async () => {
+export const getCategory = async (page=1, limit=20) => {
     try{
-        const response = await axios.get(`${API_URL}/api/recipe/category/sub/dashboard`,
+        const response = await axios.get(`${API_URL}/api/recipe/category/sub/dashboard?page=${page}&limit=${limit}`,
             {
                 headers:"application/json"
             }
