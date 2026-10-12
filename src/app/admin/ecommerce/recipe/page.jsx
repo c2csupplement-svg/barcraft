@@ -1266,7 +1266,7 @@ export default function Recipe() {
                     }
                 >
                     <p className="text-sm text-stone-600">
-                        This recipe will be removed permanently. This can't be undone.
+                        This recipe will be removed permanently. This can&apos;t be undone.
                     </p>
                 </Modal>
             )}

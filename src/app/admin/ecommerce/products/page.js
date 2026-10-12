@@ -563,7 +563,7 @@ const handleSave = async (data) => {
           ) : (
             <>
               No products yet.
-              Click "Add Product"
+              Click &quot;Add Product&quot;
               to create your first
               one.
             </>
