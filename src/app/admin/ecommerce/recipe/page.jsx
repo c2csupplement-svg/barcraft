@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
     createRecipe,
@@ -26,10 +26,18 @@ import {
     ListChecks,
     Utensils,
     UploadCloud,
+    Search,
 } from "lucide-react";
 
 const LIMIT = 10;
+const SEARCH_DELAY = 500;
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+
+const STATUS_OPTIONS = [
+    { value: "", label: "All status" },
+    { value: "true", label: "Active" },
+    { value: "false", label: "Inactive" },
+];
 
 const initialForm = {
     name: "",
@@ -316,6 +324,12 @@ export default function Recipe() {
     const [total, setTotal] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
 
+    // Search & filter
+    const [searchInput, setSearchInput] = useState("");
+    const [search, setSearch] = useState("");
+    const [statusFilter, setStatusFilter] = useState("");
+    const requestIdRef = useRef(0);
+
     const [modalOpen, setModalOpen] = useState(false);
     const [editingRecipe, setEditingRecipe] = useState(null);
     const [form, setForm] = useState(initialForm);
@@ -329,6 +343,8 @@ export default function Recipe() {
     const [deleteTarget, setDeleteTarget] = useState(null);
     const [toasts, setToasts] = useState([]);
 
+    const hasFilters = Boolean(searchInput || statusFilter);
+
     const dismissToast = (id) => {
         setToasts((previous) => previous.filter((toast) => toast.id !== id));
     };
@@ -340,11 +356,16 @@ export default function Recipe() {
     };
 
     const fetchRecipes = async () => {
+        // Ignore stale responses if a newer request has been started
+        const requestId = ++requestIdRef.current;
+
         try {
             setLoading(true);
             setLoadError("");
 
-            const response = await getRecipe(page, LIMIT);
+            const response = await getRecipe(page, LIMIT, search, statusFilter);
+            if (requestId !== requestIdRef.current) return;
+
             const data = getResponseData(response);
 
             if (data?.success === false) {
@@ -355,10 +376,11 @@ export default function Recipe() {
             setTotal(Number(data?.total ?? data?.count ?? 0));
             setTotalPages(Math.max(1, Number(data?.totalPages || 1)));
         } catch (error) {
+            if (requestId !== requestIdRef.current) return;
             console.error("Error fetching recipes:", error);
             setLoadError(getErrorMessage(error, "Unable to load recipes."));
         } finally {
-            setLoading(false);
+            if (requestId === requestIdRef.current) setLoading(false);
         }
     };
 
@@ -386,18 +408,47 @@ export default function Recipe() {
         }
     };
 
+    // Debounce the search text. Updating `search` and `page` together
+    // (batched) means only one request fires.
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setSearch(searchInput.trim());
+            setPage(1);
+        }, SEARCH_DELAY);
+
+        return () => clearTimeout(timer);
+    }, [searchInput]);
+
     useEffect(() => {
         fetchRecipes();
-    }, [page]);
+    }, [page, search, statusFilter]);
 
     useEffect(() => {
         fetchCategories();
     }, []);
 
+    const handleStatusFilterChange = (value) => {
+        setStatusFilter(value);
+        setPage(1);
+    };
+
+    const clearSearch = () => {
+        setSearchInput("");
+        setSearch("");
+        setPage(1);
+    };
+
+    const clearFilters = () => {
+        setSearchInput("");
+        setSearch("");
+        setStatusFilter("");
+        setPage(1);
+    };
+
     const activeCount = recipes.filter((recipe) => recipe.status).length;
 
     const statCards = [
-        { label: "Total recipes", value: total, note: "In your collection" },
+        { label: "Total recipes", value: total, note: hasFilters ? "Matching filters" : "In your collection" },
         { label: "Active", value: activeCount, note: "On this page" },
         { label: "Inactive", value: recipes.length - activeCount, note: "On this page" },
     ];
@@ -638,11 +689,17 @@ export default function Recipe() {
 
             await updateRecipeRecipeStatus(id, { status: !recipe.status });
 
-            setRecipes((previous) =>
-                previous.map((item) =>
-                    getRecipeId(item) === id ? { ...item, status: !item.status } : item
-                )
-            );
+            // If a status filter is active, the toggled row no longer matches,
+            // so reload; otherwise update it in place.
+            if (statusFilter) {
+                await fetchRecipes();
+            } else {
+                setRecipes((previous) =>
+                    previous.map((item) =>
+                        getRecipeId(item) === id ? { ...item, status: !item.status } : item
+                    )
+                );
+            }
         } catch (error) {
             console.error("Error updating recipe status:", error);
             notify(getErrorMessage(error, "Failed to update status."), "error");
@@ -743,6 +800,53 @@ export default function Recipe() {
                     </div>
                 )}
 
+                {/* Search & filter bar */}
+                <div className="flex flex-col gap-3 rounded-xl border border-stone-200 bg-white p-3 sm:flex-row sm:items-center">
+                    <div className="relative flex-1">
+                        <Search
+                            size={17}
+                            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-stone-400"
+                        />
+                        <input
+                            type="text"
+                            value={searchInput}
+                            onChange={(event) => setSearchInput(event.target.value)}
+                            placeholder="Search recipes by name or slug…"
+                            className={`${inputClass} pl-10 pr-10`}
+                            aria-label="Search recipes"
+                        />
+                        {searchInput && (
+                            <button
+                                type="button"
+                                onClick={clearSearch}
+                                className={`${iconButton} absolute right-1.5 top-1/2 -translate-y-1/2`}
+                                aria-label="Clear search"
+                            >
+                                <X size={15} />
+                            </button>
+                        )}
+                    </div>
+
+                    <select
+                        value={statusFilter}
+                        onChange={(event) => handleStatusFilterChange(event.target.value)}
+                        className={`${inputClass} sm:w-44`}
+                        aria-label="Filter by status"
+                    >
+                        {STATUS_OPTIONS.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
+
+                    {hasFilters && (
+                        <button type="button" onClick={clearFilters} className={secondaryButton}>
+                            Clear
+                        </button>
+                    )}
+                </div>
+
                 <div className="overflow-hidden rounded-xl border border-stone-200 bg-white">
                     <div className="overflow-x-auto">
                         <table className="w-full min-w-[860px] text-left">
@@ -772,22 +876,34 @@ export default function Recipe() {
                                     <tr>
                                         <td colSpan={6} className="px-5 py-16 text-center">
                                             <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-stone-100 text-stone-500">
-                                                <ChefHat size={22} />
+                                                {hasFilters ? <Search size={22} /> : <ChefHat size={22} />}
                                             </span>
                                             <p className="mt-3 font-semibold text-stone-800">
-                                                No recipes yet
+                                                {hasFilters ? "No recipes match your filters" : "No recipes yet"}
                                             </p>
                                             <p className="mt-1 text-sm text-stone-500">
-                                                Add your first recipe to start building the collection.
+                                                {hasFilters
+                                                    ? "Try a different search term or clear the filters."
+                                                    : "Add your first recipe to start building the collection."}
                                             </p>
-                                            <button
-                                                type="button"
-                                                onClick={openCreateModal}
-                                                className={`${primaryButton} mt-4`}
-                                            >
-                                                <Plus size={17} />
-                                                Add recipe
-                                            </button>
+                                            {hasFilters ? (
+                                                <button
+                                                    type="button"
+                                                    onClick={clearFilters}
+                                                    className={`${secondaryButton} mt-4`}
+                                                >
+                                                    Clear filters
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    onClick={openCreateModal}
+                                                    className={`${primaryButton} mt-4`}
+                                                >
+                                                    <Plus size={17} />
+                                                    Add recipe
+                                                </button>
+                                            )}
                                         </td>
                                     </tr>
                                 ) : (
